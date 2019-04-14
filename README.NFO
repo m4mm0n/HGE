@@ -1,0 +1,77 @@
+﻿                                                                       
+ ____   ____  _____      _____      _____        _____          ____   
+|    | |    ||\    \    /    /| ___|\    \   ___|\    \    ____|\   \  
+|    | |    || \    \  /    / ||    |\    \ |    |\    \  /    /\    \ 
+|    |_|    ||  \____\/    /  /|    | |    ||    | |    ||    |  |    |
+|    .-.    | \ |    /    /  / |    | |    ||    |/____/ |    |__|    |
+|    | |    |  \|___/    /  /  |    | |    ||    |\    \ |    .--.    |
+|    | |    |      /    /  /   |    | |    ||    | |    ||    |  |    |
+|____| |____|     /____/  /    |____|/____/||____| |____||____|  |____|
+|    | |    |    |`    | /     |    /    | ||    | |    ||    |  |    |
+|____| |____|    |_____|/      |____|____|/ |____| |____||____|  |____|
+  \(     )/         )/           \(    )/     \(     )/    \(      )/  
+   '     '          '             '    '       '     '      '      '  
+                     [ HYDRA GRAPHICS ENGINE ]
+
+FEATURES:
+=========
+* OpenGL implementation with ease of use together with OpenTk as bare-bone...
+
+
+CREDITS:
+========
+Core - SzarkEngine by https://github.com/jakubshark & Pixel-Engine by https://github.com/DevChrome & OLC by javidx
+
+
+
+[VERSION HISTORY]
+ ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+ v0.2 [build 1 DC 14/04/19]
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^
+ * First public beta version...
+ * Major code clean-up...
+ + Started adding 3D-support (ported directly from OLC!)...
+
+ v0.1 [build 7 DC 09/04/19]
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^
+ + Added custom Graphics2DGLException method...
+ + Added GraphicsExt::DrawBitmap method...
+ + Added optionally unsafe image/bitmap loading (faster, but more unstable!)...
+
+ v0.1 [build 6 DC 04/04/19]
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^
+ + Added custom SpriteException method...
+ * Fixed so Sprite is completely thread-safe...
+
+ v0.1 [build 5 DC 25/03/19]
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^
+ + Added DrawArc to the graphics...
+ + Added FillArc to the graphics...
+ + Added DrawGrid to the graphics...
+
+ v0.1 [build 4 DC 20/03/19]
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^
+ + Added custom usercontrol for GL form control...
+ - Removed the use of OpenTk's GLControl entirely...
+
+ v0.1 [build 3 DC 01/03/19]
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^
+ + Added GLEngineExt with more engine options...
+ * Changed Sprite to include direct initiation with bitmap aswell...
+ * Fixed Sprite to be able to GetPixel when different than normal mask...
+
+ v0.1 [build 2 DC 26/02/19]
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^
+ [PRIVATE!]
+ + Added GraphicsExt with more drawing options...
+ + Added Pixel extensions (ToPixels, FromHsv, and FromRgb)...
+ * Refactored the code...
+
+ v0.1 [build 1 DC 25/02/19]
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^
+ [PRIVATE!]
+ + First useable version/build...
+
+
+(c)2017-2019 mammon
+

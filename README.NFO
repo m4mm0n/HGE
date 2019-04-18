@@ -20,17 +20,21 @@ FEATURES:
 
 CREDITS:
 ========
-Core - SzarkEngine by https://github.com/jakubshark & Pixel-Engine by https://github.com/DevChrome & OLC by javidx
+GL Core - SzarkEngine by https://github.com/jakubshark, Pixel-Engine by https://github.com/DevChrome, OLC by https://github.com/OneLoneCoder
 
 
 
 [VERSION HISTORY]
  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+ v0.2 [build 2 DC 18/04/19]
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^
+ * Finished adding the GL 3D-support functions from OLC (NOT TESTED!)...
+
  v0.2 [build 1 DC 14/04/19]
  ^^^^^^^^^^^^^^^^^^^^^^^^^^
  * First public beta version...
  * Major code clean-up...
- + Started adding 3D-support (ported directly from OLC!)...
+ + Started adding GL 3D-support (ported directly from OLC!)...
 
  v0.1 [build 7 DC 09/04/19]
  ^^^^^^^^^^^^^^^^^^^^^^^^^^

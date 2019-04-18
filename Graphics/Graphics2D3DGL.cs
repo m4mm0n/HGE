@@ -1,5 +1,7 @@
-﻿using System;
+﻿using HGE.Graphics;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace HGE.Graphics
 {
@@ -146,29 +148,17 @@ namespace HGE.Graphics
             return matrix;
         }
 
-        public static mat4x4 Mat_MultiplyMatrix(mat4x4 m1, mat4x4 m2)
-        {
-            var matrix = new mat4x4();
-            for (var c = 0; c < 4; c++)
-            for (var r = 0; r < 4; r++)
-                matrix.m[r, c] = m1.m[r, 0] * m2.m[0, c] + m1.m[r, 1] * m2.m[1, c] + m1.m[r, 2] * m2.m[2, c] +
-                                 m1.m[r, 3] * m2.m[3, c];
-            return matrix;
-        }
-
 
         public static void DrawTriangleFlat(this Graphics2DGL gfx, triangle tri)
         {
             gfx.FillTriangle((int) tri.p[0].x, (int) tri.p[0].y, (int) tri.p[1].x, (int) tri.p[1].y, (int) tri.p[2].x,
                 (int) tri.p[2].y, tri.col);
         }
-
         public static void DrawTriangleWire(this Graphics2DGL gfx, triangle tri, Pixel col)
         {
             gfx.DrawTriangle((int) tri.p[0].x, (int) tri.p[0].y, (int) tri.p[1].x, (int) tri.p[1].y, (int) tri.p[2].x,
                 (int) tri.p[2].y, col);
         }
-
         public static void TexturedTriangle(this Graphics2DGL gfx, int x1, int y1, float u1, float v1, float w1,
             int x2, int y2, float u2, float v2, float w2,
             int x3, int y3, float u3, float v3, float w3, Sprite spr)
@@ -342,6 +332,397 @@ namespace HGE.Graphics
                     }
                 }
         }
+        public static void DrawTriangleTex(this Graphics2DGL gfx, triangle tri, Sprite spr)
+        {
+            if (m_DepthBuffer == null)
+                m_DepthBuffer = new float[gfx.DrawTarget.Width * gfx.DrawTarget.Height];
+
+            if (tri.p[1].y < tri.p[0].y)
+            {
+                swap(tri.p[0].y, tri.p[1].y);
+                swap(tri.p[0].x, tri.p[1].x);
+                swap(tri.t[0].x, tri.t[1].x);
+                swap(tri.t[0].y, tri.t[1].y);
+                swap(tri.t[0].z, tri.t[1].z);
+            }
+
+            if (tri.p[2].y < tri.p[0].y)
+            {
+                swap(tri.p[0].y, tri.p[2].y);
+                swap(tri.p[0].x, tri.p[2].x);
+                swap(tri.t[0].x, tri.t[2].x);
+                swap(tri.t[0].y, tri.t[2].y);
+                swap(tri.t[0].z, tri.t[2].z);
+            }
+
+            if (tri.p[2].y < tri.p[1].y)
+            {
+                swap(tri.p[1].y, tri.p[2].y);
+                swap(tri.p[1].x, tri.p[2].x);
+                swap(tri.t[1].x, tri.t[2].x);
+                swap(tri.t[1].y, tri.t[2].y);
+                swap(tri.t[1].z, tri.t[2].z);
+            }
+
+            int dy1 = (int)(tri.p[1].y - tri.p[0].y);
+            int dx1 = (int)(tri.p[1].x - tri.p[0].x);
+            float dv1 = tri.t[1].y - tri.t[0].y;
+            float du1 = tri.t[1].x - tri.t[0].x;
+            float dz1 = tri.t[1].z - tri.t[0].z;
+
+            int dy2 = (int)(tri.p[2].y - tri.p[0].y);
+            int dx2 = (int)(tri.p[2].x - tri.p[0].x);
+            float dv2 = tri.t[2].y - tri.t[0].y;
+            float du2 = tri.t[2].x - tri.t[0].x;
+            float dz2 = tri.t[2].z - tri.t[0].z;
+
+            float tex_x, tex_y, tex_z;
+
+            float du1_step = 0, dv1_step = 0, du2_step = 0, dv2_step = 0, dz1_step = 0, dz2_step = 0;
+            float dax_step = 0, dbx_step = 0;
+
+            if (dy1 > 0) dax_step = dx1 / (float)abs(dy1);
+            if (dy2 > 0) dbx_step = dx2 / (float)abs(dy2);
+
+            if (dy1 > 0) du1_step = du1 / (float)abs(dy1);
+            if (dy1 > 0) dv1_step = dv1 / (float)abs(dy1);
+            if (dy1 > 0) dz1_step = dz1 / (float)abs(dy1);
+
+            if (dy2 > 0) du2_step = du2 / (float)abs(dy2);
+            if (dy2 > 0) dv2_step = dv2 / (float)abs(dy2);
+            if (dy2 > 0) dz2_step = dz2 / (float)abs(dy2);
+
+
+            if (dy1 > 0)
+            {
+                for (int i = (int)tri.p[0].y; i <= tri.p[1].y; i++)
+                {
+                    int ax = (int)(tri.p[0].x + (i - tri.p[0].y) * dax_step);
+                    int bx = (int)(tri.p[0].x + (i - tri.p[0].y) * dbx_step);
+
+                    // Start and end points in texture space
+                    float tex_su = tri.t[0].x + (float)(i - tri.p[0].y) * du1_step;
+                    float tex_sv = tri.t[0].y + (float)(i - tri.p[0].y) * dv1_step;
+                    float tex_sz = tri.t[0].z + (float)(i - tri.p[0].y) * dz1_step;
+
+                    float tex_eu = tri.t[0].x + (float)(i - tri.p[0].y) * du2_step;
+                    float tex_ev = tri.t[0].y + (float)(i - tri.p[0].y) * dv2_step;
+                    float tex_ez = tri.t[0].z + (float)(i - tri.p[0].y) * dz2_step;
+
+                    if (ax > bx)
+                    {
+                        swap(ax, bx);
+                        swap(tex_su, tex_eu);
+                        swap(tex_sv, tex_ev);
+                        swap(tex_sz, tex_ez);
+                    }
+
+                    tex_x = tex_su;
+                    tex_y = tex_sv;
+                    tex_z = tex_sz;
+
+
+                    float tstep = 1.0f / ((float)(bx - ax));
+                    float t = 0;
+
+                    for (int j = ax; j < bx; j++)
+                    {
+                        tex_x = (1.0f - t) * tex_su + t * tex_eu;
+                        tex_y = (1.0f - t) * tex_sv + t * tex_ev;
+                        tex_z = (1.0f - t) * tex_sz + t * tex_ez;
+
+                        if (tex_z > m_DepthBuffer[i * gfx.DrawTarget.Width + j])
+                        {
+                            gfx.Draw(j,i,spr.Sample(tex_x / tex_z, tex_y / tex_z));
+                            m_DepthBuffer[i * gfx.DrawTarget.Width + j] = tex_z;
+                        }
+                        t += tstep;
+                    }
+                }
+            }
+
+            dy1 = (int)(tri.p[2].y - tri.p[1].y);
+            dx1 = (int)(tri.p[2].x - tri.p[1].x);
+            dv1 = tri.t[2].y - tri.t[1].y;
+            du1 = tri.t[2].x - tri.t[1].x;
+            dz1 = tri.t[2].z - tri.t[1].z;
+
+            if (dy1 > 0) dax_step = dx1 / (float)abs(dy1);
+            if (dy2 > 0) dbx_step = dx2 / (float)abs(dy2);
+
+
+            du1_step = 0; dv1_step = 0;// , dz1_step = 0;// , du2_step = 0, dv2_step = 0;
+            if (dy1 > 0) du1_step = du1 / (float)abs(dy1);
+            if (dy1 > 0) dv1_step = dv1 / (float)abs(dy1);
+            if (dy1 > 0) dz1_step = dz1 / (float)abs(dy1);
+
+            if (dy1 > 0)
+            {
+                for (int i = (int)tri.p[1].y; i <= tri.p[2].y; i++)
+                {
+                    int ax = (int)(tri.p[1].x + (i - tri.p[1].y) * dax_step);
+                    int bx = (int)(tri.p[0].x + (i - tri.p[0].y) * dbx_step);
+
+                    // Start and end points in texture space
+                    float tex_su = tri.t[1].x + (float)(i - tri.p[1].y) * du1_step;
+                    float tex_sv = tri.t[1].y + (float)(i - tri.p[1].y) * dv1_step;
+                    float tex_sz = tri.t[1].z + (float)(i - tri.p[1].y) * dz1_step;
+
+                    float tex_eu = tri.t[0].x + (float)(i - tri.p[0].y) * du2_step;
+                    float tex_ev = tri.t[0].y + (float)(i - tri.p[0].y) * dv2_step;
+                    float tex_ez = tri.t[0].z + (float)(i - tri.p[0].y) * dz2_step;
+
+                    if (ax > bx)
+                    {
+                        swap(ax, bx);
+                        swap(tex_su, tex_eu);
+                        swap(tex_sv, tex_ev);
+                        swap(tex_sz, tex_ez);
+                    }
+
+                    tex_x = tex_su;
+                    tex_y = tex_sv;
+                    tex_z = tex_sz;
+
+
+                    float tstep = 1.0f / ((float)(bx - ax));
+                    float t = 0;
+
+                    for (int j = ax; j < bx; j++)
+                    {
+                        tex_x = (1.0f - t) * tex_su + t * tex_eu;
+                        tex_y = (1.0f - t) * tex_sv + t * tex_ev;
+                        tex_z = (1.0f - t) * tex_sz + t * tex_ez;
+
+                        if (tex_z > m_DepthBuffer[i * gfx.DrawTarget.Width + j])
+                        {
+                            gfx.Draw(j, i, spr.Sample(tex_x / tex_z, tex_y / tex_z));
+                            m_DepthBuffer[i * gfx.DrawTarget.Width + j] = tex_z;
+                        }
+                        t += tstep;
+                    }
+                }
+            }
+        }
+
+        #region Pipeline
+
+        public static void SetProjection(float fFovDegrees, float fAspectRatio, float fNear, float fFar, float fLeft, float fTop, float fWidth, float fHeight)
+        {
+            matProj = Mat_MakeProjection(fFovDegrees, fAspectRatio, fNear, fFar);
+            fViewX = fLeft;
+            fViewY = fTop;
+            fViewW = fWidth;
+            fViewH = fHeight;
+        }
+
+        public static void SetCamera(vec3d pos, vec3d lookat, vec3d up) =>
+            matView = mat4x4.PointAt(pos, lookat, up).QuickInverse();
+
+        public static void SetTransform(mat4x4 transform) => 
+            matWorld = transform;
+
+        public static void SetTexture(Sprite texture) =>
+            sprTexture = texture;
+
+        public static int Render(this Graphics2DGL gfx, List<triangle> triangles, int flags)
+        {
+            // Calculate Transformation Matrix
+            //mat4x4 matWorldView = Math::Mat_MultiplyMatrix(matWorld, matView);
+            var matWorldView = matWorld * matView;
+
+            // Store triangles for rastering later
+            //std::vector<GFX3D::triangle> vecTrianglesToRaster;
+            var vecTrianglesToRaster = new List<triangle>();
+
+            int nTriangleDrawnCount = 0;
+            foreach (var tri in triangles)
+            {
+                var triTransformed = new triangle();
+
+                // Just copy through texture coordinates
+                triTransformed.t[0] = new vec2d()
+                {
+                    x = tri.t[0].x, y = tri.t[0].y, z = tri.t[0].z
+                };
+
+                triTransformed.t[1] = new vec2d()
+                {
+                    x = tri.t[1].x, y = tri.t[1].y, z = tri.t[1].z
+                };
+                triTransformed.t[2] = new vec2d()
+                {
+                    x = tri.t[2].x, y = tri.t[2].y, z = tri.t[2].z
+                }; // Think!
+
+                // Transform Triangle from object into projected space
+                triTransformed.p[0] = Mat_MultiplyVector(matWorldView, tri.p[0]);
+                triTransformed.p[1] = Mat_MultiplyVector(matWorldView, tri.p[1]);
+                triTransformed.p[2] = Mat_MultiplyVector(matWorldView, tri.p[2]);
+
+                // Calculate Triangle Normal in WorldView Space
+                var line1 = triTransformed.p[1] - triTransformed.p[0];
+                var line2 = triTransformed.p[2] - triTransformed.p[0];
+                var normal = line1.CrossProduct(line2).Normalize();
+
+                // Cull triangles that face away from viewer
+                if ((flags & (int)RENDERFLAGS.RENDER_CULL_CCW) != 0 && normal.DotProduct(triTransformed.p[0]) > 0.0f) continue;
+                if ((flags & (int)RENDERFLAGS.RENDER_CULL_CCW) != 0 && normal.DotProduct(triTransformed.p[0]) < 0.0f) continue;
+
+                // If Lighting, calculate shading
+                triTransformed.col = Pixel.WHITE;
+
+                // Clip triangle against near plane
+                int nClippedTriangles = 0;
+                triangle[] clipped = new triangle[2];
+                nClippedTriangles = triangle.ClipAgainstPlane(new vec3d() {x = 0.0f, y = 0.0f, z = 0.1f},
+                    new vec3d() {x = 0.0f, y = 0.0f, z = 1.0f}, triTransformed, clipped[0], clipped[1]);
+
+                // This may yield two new triangles
+                for (int n = 0; n < nClippedTriangles; n++)
+                {
+                    var triProjected = clipped[n];
+
+                    // Project new triangle
+                    triProjected.p[0] = Mat_MultiplyVector(matProj, clipped[n].p[0]);
+                    triProjected.p[1] = Mat_MultiplyVector(matProj, clipped[n].p[1]);
+                    triProjected.p[2] = Mat_MultiplyVector(matProj, clipped[n].p[2]);
+
+                    // Apply Projection to Verts
+                    triProjected.p[0].x = triProjected.p[0].x / triProjected.p[0].w;
+                    triProjected.p[1].x = triProjected.p[1].x / triProjected.p[1].w;
+                    triProjected.p[2].x = triProjected.p[2].x / triProjected.p[2].w;
+
+                    triProjected.p[0].y = triProjected.p[0].y / triProjected.p[0].w;
+                    triProjected.p[1].y = triProjected.p[1].y / triProjected.p[1].w;
+                    triProjected.p[2].y = triProjected.p[2].y / triProjected.p[2].w;
+
+                    triProjected.p[0].z = triProjected.p[0].z / triProjected.p[0].w;
+                    triProjected.p[1].z = triProjected.p[1].z / triProjected.p[1].w;
+                    triProjected.p[2].z = triProjected.p[2].z / triProjected.p[2].w;
+
+                    // Apply Projection to Tex coords
+                    triProjected.t[0].x = triProjected.t[0].x / triProjected.p[0].w;
+                    triProjected.t[1].x = triProjected.t[1].x / triProjected.p[1].w;
+                    triProjected.t[2].x = triProjected.t[2].x / triProjected.p[2].w;
+
+                    triProjected.t[0].y = triProjected.t[0].y / triProjected.p[0].w;
+                    triProjected.t[1].y = triProjected.t[1].y / triProjected.p[1].w;
+                    triProjected.t[2].y = triProjected.t[2].y / triProjected.p[2].w;
+
+                    triProjected.t[0].z = 1.0f / triProjected.p[0].w;
+                    triProjected.t[1].z = 1.0f / triProjected.p[1].w;
+                    triProjected.t[2].z = 1.0f / triProjected.p[2].w;
+
+                    // Clip against viewport in screen space
+                    // Clip triangles against all four screen edges, this could yield
+                    // a bunch of triangles, so create a queue that we traverse to 
+                    //  ensure we only test new triangles generated against planes
+                    triangle[] sclipped = new triangle[2];
+                    var listTriangles = new List<triangle>();
+
+                    // Add initial triangle
+                    listTriangles.Add(triProjected);
+                    int nNewTriangles = 1;
+
+                    for (int p = 0; p < 4; p++)
+                    {
+                        int nTrisToAdd = 0;
+                        while (nNewTriangles > 0)
+                        {
+                            var test = listTriangles.First();
+                            listTriangles.RemoveAt(0);
+                            nNewTriangles--;
+
+                            // Clip it against a plane. We only need to test each 
+                            // subsequent plane, against subsequent new triangles
+                            // as all triangles after a plane clip are guaranteed
+                            // to lie on the inside of the plane. I like how this
+                            // comment is almost completely and utterly justified
+                            switch (p)
+                            {
+                                case 0:
+                                    nTrisToAdd = triangle.ClipAgainstPlane(new vec3d() {x = 0.0f, y = -1.0f, z = 0.0f},
+                                        new vec3d() {x = 0.0f, y = 1.0f, z = 0.0f}, test, sclipped[0], sclipped[1]);
+                                    break;
+                                case 1:
+                                    nTrisToAdd = triangle.ClipAgainstPlane(new vec3d() {x = 0.0f, y = +1.0f, z = 0.0f},
+                                        new vec3d() {x = 0.0f, y = -1.0f, z = 0.0f}, test, sclipped[0], sclipped[1]);
+                                    break;
+                                case 2:
+                                    nTrisToAdd = triangle.ClipAgainstPlane(new vec3d() {x = -1.0f, y = 0.0f, z = 0.0f},
+                                        new vec3d() {x = 1.0f, y = 0.0f, z = 0.0f}, test, sclipped[0], sclipped[1]);
+                                    break;
+                                case 3:
+                                    nTrisToAdd = triangle.ClipAgainstPlane(new vec3d() {x = +1.0f, y = 0.0f, z = 0.0f},
+                                        new vec3d() {x = -1.0f, y = 0.0f, z = 0.0f}, test, sclipped[0], sclipped[1]);
+                                    break;
+                            }
+
+                            // Clipping may yield a variable number of triangles, so
+                            // add these new ones to the back of the queue for subsequent
+                            // clipping against next planes
+                            for (int w = 0; w < nTrisToAdd; w++)
+                                listTriangles.Add(sclipped[w]);
+                        }
+
+                        nNewTriangles = listTriangles.Count;
+                    }
+
+                    foreach (var triRaster in listTriangles)
+                    {
+                        // Scale to viewport
+                        vec3d vOffsetView = new vec3d() {x= 1,y= 1,z= 0 };
+                        triRaster.p[0] = triRaster.p[0] + vOffsetView;
+                        triRaster.p[1] = triRaster.p[1] + vOffsetView;
+                        triRaster.p[2] = triRaster.p[2] + vOffsetView;
+                        triRaster.p[0].x *= 0.5f * fViewW;
+                        triRaster.p[0].y *= 0.5f * fViewH;
+                        triRaster.p[1].x *= 0.5f * fViewW;
+                        triRaster.p[1].y *= 0.5f * fViewH;
+                        triRaster.p[2].x *= 0.5f * fViewW;
+                        triRaster.p[2].y *= 0.5f * fViewH;
+                        vOffsetView = new vec3d() {x= fViewX,y=fViewY,z=0 };
+                        triRaster.p[0] = triRaster.p[0] + vOffsetView;
+                        triRaster.p[1] = triRaster.p[1] + vOffsetView;
+                        triRaster.p[2] = triRaster.p[2] + vOffsetView;
+
+                        // For now, just draw triangle
+                        if ((flags & (int)RENDERFLAGS.RENDER_TEXTURED) != 0)
+                            TexturedTriangle(gfx,
+                                (int)triRaster.p[0].x, (int)triRaster.p[0].y, triRaster.t[0].x, triRaster.t[0].y, triRaster.t[0].z,
+                                (int)triRaster.p[1].x, (int)triRaster.p[1].y, triRaster.t[1].x, triRaster.t[1].y, triRaster.t[1].z,
+                                (int)triRaster.p[2].x, (int)triRaster.p[2].y, triRaster.t[2].x, triRaster.t[2].y, triRaster.t[2].z,
+                                sprTexture);
+
+                        if((flags & (int)RENDERFLAGS.RENDER_WIRE) != 0)
+                            DrawTriangleWire(gfx, triRaster, Pixel.RED);
+
+                        if((flags & (int)RENDERFLAGS.RENDER_FLAT) != 0)
+                            DrawTriangleFlat(gfx, triRaster);
+
+                        nTriangleDrawnCount++;
+                    }
+                }
+            }
+            return nTriangleDrawnCount;
+        }
+
+
+        #endregion
+
+        #region Private Declares
+
+        private static mat4x4 matProj;
+        private static mat4x4 matView;
+        private static mat4x4 matWorld;
+        private static Sprite sprTexture;
+        private static float fViewX;
+        private static float fViewY;
+        private static float fViewW;
+        private static float fViewH;
+
+        #endregion
 
         public class vec2d
         {
@@ -533,6 +914,11 @@ namespace HGE.Graphics
                 };
             }
 
+            public float DotProduct(vec3d v2) => DotProduct(this, v2);
+            public float Length() => Length(this);
+            public vec3d Normalize() => Normalize(this);
+            public vec3d CrossProduct(vec3d v2) => CrossProduct(this, v2);
+
             public static float DotProduct(vec3d v1, vec3d v2)
             {
                 return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
@@ -711,6 +1097,161 @@ namespace HGE.Graphics
             {
                 {0F, 0F, 0F, 0F}
             };
+
+            public mat4x4 QuickInverse() => QuickInverse(this);
+            public mat4x4 Inverse() => Inverse(this);
+
+            public static mat4x4 PointAt(vec3d pos, vec3d target, vec3d up)
+            {
+                // Calculate new forward direction
+                //olc::GFX3D::vec3d newForward = Vec_Sub(target, pos);
+                //newForward = Vec_Normalise(newForward);
+                var newForward = (target - pos).Normalize();
+
+                // Calculate new Up direction
+                //olc::GFX3D::vec3d a = Vec_Mul(newForward, Vec_DotProduct(up, newForward));
+                var a = newForward * up.DotProduct(newForward);
+                //olc::GFX3D::vec3d newUp = Vec_Sub(up, a);
+                //newUp = Vec_Normalise(newUp);
+                var newUp = (up - a).Normalize();
+
+                // New Right direction is easy, its just cross product
+                //olc::GFX3D::vec3d newRight = Vec_CrossProduct(newUp, newForward);
+                var newRight = newUp.CrossProduct(newForward);
+
+                // Construct Dimensioning and Translation Matrix	
+                //olc::GFX3D::mat4x4 matrix;
+                var matrix = new mat4x4
+                {
+                    m =
+                    {
+                        [0, 0] = newRight.x,
+                        [0, 1] = newRight.y,
+                        [0, 2] = newRight.z,
+                        [0, 3] = 0.0f,
+                        [1, 0] = newUp.x,
+                        [1, 1] = newUp.y,
+                        [1, 2] = newUp.z,
+                        [1, 3] = 0.0f,
+                        [2, 0] = newForward.x,
+                        [2, 1] = newForward.y,
+                        [2, 2] = newForward.z,
+                        [2, 3] = 0.0f,
+                        [3, 0] = pos.x,
+                        [3, 1] = pos.y,
+                        [3, 2] = pos.z,
+                        [3, 3] = 1.0f
+                    }
+                };
+                return matrix;
+            }
+
+            public static mat4x4 QuickInverse(mat4x4 m)
+            {
+                var matrix = new mat4x4
+                {
+                    m =
+                    {
+                        [0, 0] = m.m[0, 0],
+                        [0, 1] = m.m[1, 0],
+                        [0, 2] = m.m[2, 0],
+                        [0, 3] = 0.0f,
+                        [1, 0] = m.m[0, 1],
+                        [1, 1] = m.m[1, 1],
+                        [1, 2] = m.m[2, 1],
+                        [1, 3] = 0.0f,
+                        [2, 0] = m.m[0, 2],
+                        [2, 1] = m.m[1, 2],
+                        [2, 2] = m.m[2, 2],
+                        [2, 3] = 0.0f
+                    }
+                };
+                matrix.m[3,0] = -(m.m[3,0] * matrix.m[0,0] + m.m[3,1] * matrix.m[1,0] + m.m[3,2] * matrix.m[2,0]);
+                matrix.m[3,1] = -(m.m[3,0] * matrix.m[0,1] + m.m[3,1] * matrix.m[1,1] + m.m[3,2] * matrix.m[2,1]);
+                matrix.m[3,2] = -(m.m[3,0] * matrix.m[0,2] + m.m[3,1] * matrix.m[1,2] + m.m[3,2] * matrix.m[2,2]);
+                matrix.m[3,3] = 1.0f;
+                return matrix;
+            }
+
+            public static mat4x4 Inverse(mat4x4 m)
+            {
+                var matInv = new mat4x4
+                {
+                    m =
+                    {
+                        [0, 0] = m.m[1, 1] * m.m[2, 2] * m.m[3, 3] - m.m[1, 1] * m.m[2, 3] * m.m[3, 2] -
+                                 m.m[2, 1] * m.m[1, 2] * m.m[3, 3] + m.m[2, 1] * m.m[1, 3] * m.m[3, 2] +
+                                 m.m[3, 1] * m.m[1, 2] * m.m[2, 3] - m.m[3, 1] * m.m[1, 3] * m.m[2, 2],
+                        [1, 0] = -m.m[1, 0] * m.m[2, 2] * m.m[3, 3] + m.m[1, 0] * m.m[2, 3] * m.m[3, 2] +
+                                 m.m[2, 0] * m.m[1, 2] * m.m[3, 3] - m.m[2, 0] * m.m[1, 3] * m.m[3, 2] -
+                                 m.m[3, 0] * m.m[1, 2] * m.m[2, 3] + m.m[3, 0] * m.m[1, 3] * m.m[2, 2],
+                        [2, 0] = m.m[1, 0] * m.m[2, 1] * m.m[3, 3] - m.m[1, 0] * m.m[2, 3] * m.m[3, 1] -
+                                 m.m[2, 0] * m.m[1, 1] * m.m[3, 3] + m.m[2, 0] * m.m[1, 3] * m.m[3, 1] +
+                                 m.m[3, 0] * m.m[1, 1] * m.m[2, 3] - m.m[3, 0] * m.m[1, 3] * m.m[2, 1],
+                        [3, 0] = -m.m[1, 0] * m.m[2, 1] * m.m[3, 2] + m.m[1, 0] * m.m[2, 2] * m.m[3, 1] +
+                                 m.m[2, 0] * m.m[1, 1] * m.m[3, 2] - m.m[2, 0] * m.m[1, 2] * m.m[3, 1] -
+                                 m.m[3, 0] * m.m[1, 1] * m.m[2, 2] + m.m[3, 0] * m.m[1, 2] * m.m[2, 1],
+                        [0, 1] = -m.m[0, 1] * m.m[2, 2] * m.m[3, 3] + m.m[0, 1] * m.m[2, 3] * m.m[3, 2] +
+                                 m.m[2, 1] * m.m[0, 2] * m.m[3, 3] - m.m[2, 1] * m.m[0, 3] * m.m[3, 2] -
+                                 m.m[3, 1] * m.m[0, 2] * m.m[2, 3] + m.m[3, 1] * m.m[0, 3] * m.m[2, 2],
+                        [1, 1] = m.m[0, 0] * m.m[2, 2] * m.m[3, 3] - m.m[0, 0] * m.m[2, 3] * m.m[3, 2] -
+                                 m.m[2, 0] * m.m[0, 2] * m.m[3, 3] + m.m[2, 0] * m.m[0, 3] * m.m[3, 2] +
+                                 m.m[3, 0] * m.m[0, 2] * m.m[2, 3] - m.m[3, 0] * m.m[0, 3] * m.m[2, 2],
+                        [2, 1] = -m.m[0, 0] * m.m[2, 1] * m.m[3, 3] + m.m[0, 0] * m.m[2, 3] * m.m[3, 1] +
+                                 m.m[2, 0] * m.m[0, 1] * m.m[3, 3] - m.m[2, 0] * m.m[0, 3] * m.m[3, 1] -
+                                 m.m[3, 0] * m.m[0, 1] * m.m[2, 3] + m.m[3, 0] * m.m[0, 3] * m.m[2, 1],
+                        [3, 1] = m.m[0, 0] * m.m[2, 1] * m.m[3, 2] - m.m[0, 0] * m.m[2, 2] * m.m[3, 1] -
+                                 m.m[2, 0] * m.m[0, 1] * m.m[3, 2] + m.m[2, 0] * m.m[0, 2] * m.m[3, 1] +
+                                 m.m[3, 0] * m.m[0, 1] * m.m[2, 2] - m.m[3, 0] * m.m[0, 2] * m.m[2, 1],
+                        [0, 2] = m.m[0, 1] * m.m[1, 2] * m.m[3, 3] - m.m[0, 1] * m.m[1, 3] * m.m[3, 2] -
+                                 m.m[1, 1] * m.m[0, 2] * m.m[3, 3] + m.m[1, 1] * m.m[0, 3] * m.m[3, 2] +
+                                 m.m[3, 1] * m.m[0, 2] * m.m[1, 3] - m.m[3, 1] * m.m[0, 3] * m.m[1, 2],
+                        [1, 2] = -m.m[0, 0] * m.m[1, 2] * m.m[3, 3] + m.m[0, 0] * m.m[1, 3] * m.m[3, 2] +
+                                 m.m[1, 0] * m.m[0, 2] * m.m[3, 3] - m.m[1, 0] * m.m[0, 3] * m.m[3, 2] -
+                                 m.m[3, 0] * m.m[0, 2] * m.m[1, 3] + m.m[3, 0] * m.m[0, 3] * m.m[1, 2],
+                        [2, 2] = m.m[0, 0] * m.m[1, 1] * m.m[3, 3] - m.m[0, 0] * m.m[1, 3] * m.m[3, 1] -
+                                 m.m[1, 0] * m.m[0, 1] * m.m[3, 3] + m.m[1, 0] * m.m[0, 3] * m.m[3, 1] +
+                                 m.m[3, 0] * m.m[0, 1] * m.m[1, 3] - m.m[3, 0] * m.m[0, 3] * m.m[1, 1],
+                        [3, 2] = -m.m[0, 0] * m.m[1, 1] * m.m[3, 2] + m.m[0, 0] * m.m[1, 2] * m.m[3, 1] +
+                                 m.m[1, 0] * m.m[0, 1] * m.m[3, 2] - m.m[1, 0] * m.m[0, 2] * m.m[3, 1] -
+                                 m.m[3, 0] * m.m[0, 1] * m.m[1, 2] + m.m[3, 0] * m.m[0, 2] * m.m[1, 1],
+                        [0, 3] = -m.m[0, 1] * m.m[1, 2] * m.m[2, 3] + m.m[0, 1] * m.m[1, 3] * m.m[2, 2] +
+                                 m.m[1, 1] * m.m[0, 2] * m.m[2, 3] - m.m[1, 1] * m.m[0, 3] * m.m[2, 2] -
+                                 m.m[2, 1] * m.m[0, 2] * m.m[1, 3] + m.m[2, 1] * m.m[0, 3] * m.m[1, 2],
+                        [1, 3] = m.m[0, 0] * m.m[1, 2] * m.m[2, 3] - m.m[0, 0] * m.m[1, 3] * m.m[2, 2] -
+                                 m.m[1, 0] * m.m[0, 2] * m.m[2, 3] + m.m[1, 0] * m.m[0, 3] * m.m[2, 2] +
+                                 m.m[2, 0] * m.m[0, 2] * m.m[1, 3] - m.m[2, 0] * m.m[0, 3] * m.m[1, 2],
+                        [2, 3] = -m.m[0, 0] * m.m[1, 1] * m.m[2, 3] + m.m[0, 0] * m.m[1, 3] * m.m[2, 1] +
+                                 m.m[1, 0] * m.m[0, 1] * m.m[2, 3] - m.m[1, 0] * m.m[0, 3] * m.m[2, 1] -
+                                 m.m[2, 0] * m.m[0, 1] * m.m[1, 3] + m.m[2, 0] * m.m[0, 3] * m.m[1, 1],
+                        [3, 3] = m.m[0, 0] * m.m[1, 1] * m.m[2, 2] - m.m[0, 0] * m.m[1, 2] * m.m[2, 1] -
+                                 m.m[1, 0] * m.m[0, 1] * m.m[2, 2] + m.m[1, 0] * m.m[0, 2] * m.m[2, 1] +
+                                 m.m[2, 0] * m.m[0, 1] * m.m[1, 2] - m.m[2, 0] * m.m[0, 2] * m.m[1, 1]
+                    }
+                };
+
+
+                var det = m.m[0, 0] * matInv.m[0, 0] + m.m[0, 1] * matInv.m[1, 0] + m.m[0, 2] * matInv.m[2, 0] + m.m[0, 3] * matInv.m[3, 0];
+                //	if (det == 0) return false;
+
+                det = 1.0f / det;
+
+                for (int i = 0; i < 4; i++)
+                    for (int j = 0; j < 4; j++)
+                        matInv.m[i, j] *= (float)det;
+
+                return matInv;
+            }
+
+            public static mat4x4 operator *(mat4x4 m1, mat4x4 m2)
+            {
+                var matrix = new mat4x4();
+                for (var c = 0; c < 4; c++)
+                for (var r = 0; r < 4; r++)
+                    matrix.m[r, c] = m1.m[r, 0] * m2.m[0, c] + m1.m[r, 1] * m2.m[1, c] + m1.m[r, 2] * m2.m[2, c] +
+                                     m1.m[r, 3] * m2.m[3, c];
+                return matrix;
+            }
         }
 
         public class mesh

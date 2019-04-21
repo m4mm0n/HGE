@@ -26,6 +26,11 @@ GL Core - SzarkEngine by https://github.com/jakubshark, Pixel-Engine by https://
 
 [VERSION HISTORY]
  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+ v0.2 [build 3 DC 21/04/19]
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^
+ + Added a helper method for resizing images on the fly...
+ * Changed and begun moving all primitives into a single method (old methods still available)...
+
  v0.2 [build 2 DC 18/04/19]
  ^^^^^^^^^^^^^^^^^^^^^^^^^^
  * Finished adding the GL 3D-support functions from OLC (NOT TESTED!)...

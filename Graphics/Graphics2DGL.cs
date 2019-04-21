@@ -1,4 +1,5 @@
 ﻿using System;
+using HGE.Graphics.Primitives;
 
 namespace HGE.Graphics
 {
@@ -57,6 +58,37 @@ namespace HGE.Graphics
         }
 
         /// <summary>
+        ///     Draw specific primitive to screen
+        /// </summary>
+        /// <param name="primitive">Primitive Type</param>
+        /// <param name="fill">Fills the screen</param>
+        /// <param name="parameters">The needed parameters</param>
+        public virtual void Draw(DrawablePrimitives primitive, bool fill, params object[] parameters)
+        {
+            switch (primitive)
+            {
+                case DrawablePrimitives.Circle:
+                    if(fill)
+                        new Circle().Fill(this, parameters);
+                    else
+                        new Circle().Draw(this, parameters);
+                    break;
+                case DrawablePrimitives.Rectangle:
+                    if(fill)
+                        new Rectangle().Fill(this, parameters);
+                    else
+                        new Rectangle().Draw(this, parameters);
+                    break;
+                case DrawablePrimitives.Triangle:
+                    if(fill)
+                        new Triangle().Fill(this, parameters);
+                    else
+                        new Triangle().Draw(this, parameters);
+                    break;
+            }
+        }
+
+        /// <summary>
         ///     Draws a line
         /// </summary>
         /// <param name="x1">X1</param>
@@ -106,6 +138,7 @@ namespace HGE.Graphics
         /// <param name="w">Width</param>
         /// <param name="h">Height</param>
         /// <param name="color">Color</param>
+        [Obsolete("This method will be removed in favour of Draw(DrawablePrimitives, bool, params)!")]
         public void DrawRect(int x, int y, int w, int h, Pixel color)
         {
             if (w < 0)
@@ -128,6 +161,7 @@ namespace HGE.Graphics
         /// <param name="w">Width</param>
         /// <param name="h">Height</param>
         /// <param name="color">Color</param>
+        [Obsolete("This method will be removed in favour of Draw(DrawablePrimitives, bool, params)!")]
         public void FillRect(int x, int y, int w, int h, Pixel color)
         {
             for (var i = 0; i < w; i++)
@@ -142,6 +176,7 @@ namespace HGE.Graphics
         /// <param name="y0">Y</param>
         /// <param name="r">Radius</param>
         /// <param name="color">Color</param>
+        [Obsolete("This method will be removed in favour of Draw(DrawablePrimitives, bool, params)!")]
         public void DrawCircle(int x0, int y0, int r, Pixel color)
         {
             x0 += r - 1;
@@ -187,6 +222,7 @@ namespace HGE.Graphics
         /// <param name="y">Y</param>
         /// <param name="r">Radius</param>
         /// <param name="color">Color</param>
+        [Obsolete("This method will be removed in favour of Draw(DrawablePrimitives, bool, params)!")]
         public void FillCircle(int x, int y, int r, Pixel color)
         {
             for (var i = 0; i < r * 2; i++)
@@ -207,6 +243,7 @@ namespace HGE.Graphics
         /// <param name="x3">X3</param>
         /// <param name="y3">Y3</param>
         /// <param name="color">Color</param>
+        [Obsolete("This method will be removed in favour of Draw(DrawablePrimitives, bool, params)!")]
         public void DrawTriangle(int x1, int y1, int x2, int y2, int x3, int y3, Pixel color)
         {
             DrawLine(x1, y1, x2, y2, color);
@@ -224,6 +261,7 @@ namespace HGE.Graphics
         /// <param name="x3">X3</param>
         /// <param name="y3">Y3</param>
         /// <param name="color">Color</param>
+        [Obsolete("This method will be removed in favour of Draw(DrawablePrimitives, bool, params)!")]
         public void FillTriangle(int x1, int y1, int x2, int y2, int x3, int y3, Pixel color)
         {
             var minX = Math.Min(Math.Min(x1, x2), x3);
@@ -249,7 +287,7 @@ namespace HGE.Graphics
             }
         }
 
-        private float Sign(int x1, int y1, int x2, int y2, int x3, int y3)
+        internal float Sign(int x1, int y1, int x2, int y2, int x3, int y3)
         {
             return (x1 - x3) * (y2 - y3) - (x2 - x3) * (y1 - y3);
         }

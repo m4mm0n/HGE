@@ -52,6 +52,9 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="NAudio">
+      <HintPath>..\NAudio.dll</HintPath>
+    </Reference>
     <Reference Include="OpenTK, Version=3.0.1.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenTK.3.0.1\lib\net20\OpenTK.dll</HintPath>
     </Reference>
@@ -68,6 +71,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Events\AudioEngineException.cs" />
     <Compile Include="Events\ErrorEvent.cs" />
     <Compile Include="Events\FrequencyEvent.cs" />
     <Compile Include="Events\Graphics2DGLException.cs" />
@@ -93,7 +97,86 @@
       <DependentUpon>HydraGL.cs</DependentUpon>
     </Compile>
     <Compile Include="IEngine.cs" />
-    <Compile Include="IO\AudioEngine.cs" />
+    <Compile Include="IO\AudioEngine\bassAudioCore.cs" />
+    <Compile Include="IO\AudioEngine\BASSlib\BASSActive.cs" />
+    <Compile Include="IO\AudioEngine\BASSlib\BASSChannelType.cs" />
+    <Compile Include="IO\AudioEngine\BASSlib\BASSConfig.cs" />
+    <Compile Include="IO\AudioEngine\BASSlib\BASSData.cs" />
+    <Compile Include="IO\AudioEngine\BASSlib\BASSError.cs" />
+    <Compile Include="IO\AudioEngine\BASSlib\BASSFlag.cs" />
+    <Compile Include="IO\AudioEngine\BASSlib\BASSInit.cs" />
+    <Compile Include="IO\AudioEngine\BASSlib\BASSMode.cs" />
+    <Compile Include="IO\AudioEngine\BASSlib\BASSTag.cs" />
+    <Compile Include="IO\AudioEngine\BASSlib\PluginFI.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayAudioCore.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\common\BufPos.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\common\events\CiaEvent.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\common\events\CPUEvent.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\common\events\Event.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\common\events\EventList.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\common\events\EventMixer.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\common\events\EventRTC.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\common\events\EventScheduler.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\common\events\EventTa.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\common\events\EventTb.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\common\events\EventTimeWarp.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\common\events\EventTod.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\common\events\event_phase_t.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\common\events\GalwayEvent.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\common\events\SampleEvent.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\common\events\xSIDEvent.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\common\file65.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\common\SID2Types.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\common\sid2_config_t.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\common\sid2_info_t.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\common\SIDEndian.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\mem\memBasic.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\mem\memChar.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\mem\memKernal.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\mem\memPowerOn.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\mem\memPSIDDrv.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\mos6510\Disassembler.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\mos6510\MOS6510.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\mos6510\OpCode.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\mos6510\ProcessorCycle.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\mos6510\ProcessorOperations.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\mos6510\SID6510.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\mos6526\C64cia1.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\mos6526\C64cia2.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\mos6526\MOS6526.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\mos6526\SID6526.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\mos656x\C64VIC.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\mos656x\MOS656X.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\sidtune\Buffer_sidtt.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\sidtune\PHeader.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\sidtune\PP20.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\sidtune\PSid.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\sidtune\SidTune.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\sidtune\SidTuneInfo.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\sidtune\SmartPtrBase_sidtt.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\sidtune\SmartPtr_sidtt.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\sid\NullSID.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\sid\resid\Coefficients.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\sid\resid\CycleCount.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\sid\resid\EnvelopeGenerator.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\sid\resid\ExternalFilter.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\sid\resid\FCPoints.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\sid\resid\Filter.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\sid\resid\memWave6581.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\sid\resid\memWave8580.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\sid\resid\PointPlotter.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\sid\resid\ReSID.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\sid\resid\SID.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\sid\resid\SIDDefs.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\sid\resid\sid_filter_t.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\sid\resid\State.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\sid\resid\Voice.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\sid\resid\WaveformGenerator.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\sid\SIDEmu.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\sid\xsid\Channel.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\components\sid\xsid\XSID.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\sidPlayer.cs" />
+    <Compile Include="IO\AudioEngine\sidPlayLib\sidWaveOut.cs" />
     <Compile Include="IO\DynamicNativeLibrary.cs" />
     <Compile Include="IO\GLEngine.cs" />
     <Compile Include="IO\GLEngineExt.cs" />
@@ -126,7 +209,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties BuildVersion_UpdateAssemblyVersion="True" BuildVersion_BuildVersioningStyle="None.None.Increment.DayStamp" BuildVersion_StartDate="2019/2/25" BuildVersion_UpdateFileVersion="True" BuildVersion_ConfigurationName="Release" />
+      <UserProperties BuildVersion_ConfigurationName="Release" BuildVersion_UpdateFileVersion="True" BuildVersion_StartDate="2019/2/25" BuildVersion_BuildVersioningStyle="None.None.Increment.DayStamp" BuildVersion_UpdateAssemblyVersion="True" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

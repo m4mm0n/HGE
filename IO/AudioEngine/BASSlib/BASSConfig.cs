@@ -1,0 +1,203 @@
+﻿namespace HGE.IO.AudioEngine.BASSlib
+{
+    public enum BASSConfig
+    {
+        // Token: 0x04000468 RID: 1128
+        BASS_CONFIG_BUFFER,
+
+        // Token: 0x04000469 RID: 1129
+        BASS_CONFIG_UPDATEPERIOD,
+
+        // Token: 0x0400046A RID: 1130
+        BASS_CONFIG_GVOL_SAMPLE = 4,
+
+        // Token: 0x0400046B RID: 1131
+        BASS_CONFIG_GVOL_STREAM,
+
+        // Token: 0x0400046C RID: 1132
+        BASS_CONFIG_GVOL_MUSIC,
+
+        // Token: 0x0400046D RID: 1133
+        BASS_CONFIG_CURVE_VOL,
+
+        // Token: 0x0400046E RID: 1134
+        BASS_CONFIG_CURVE_PAN,
+
+        // Token: 0x0400046F RID: 1135
+        BASS_CONFIG_FLOATDSP,
+
+        // Token: 0x04000470 RID: 1136
+        BASS_CONFIG_3DALGORITHM,
+
+        // Token: 0x04000471 RID: 1137
+        BASS_CONFIG_NET_TIMEOUT,
+
+        // Token: 0x04000472 RID: 1138
+        BASS_CONFIG_NET_BUFFER,
+
+        // Token: 0x04000473 RID: 1139
+        BASS_CONFIG_PAUSE_NOPLAY,
+
+        // Token: 0x04000474 RID: 1140
+        BASS_CONFIG_NET_PREBUF = 15,
+
+        // Token: 0x04000475 RID: 1141
+        BASS_CONFIG_NET_AGENT,
+
+        // Token: 0x04000476 RID: 1142
+        BASS_CONFIG_NET_PROXY,
+
+        // Token: 0x04000477 RID: 1143
+        BASS_CONFIG_NET_PASSIVE,
+
+        // Token: 0x04000478 RID: 1144
+        BASS_CONFIG_REC_BUFFER,
+
+        // Token: 0x04000479 RID: 1145
+        BASS_CONFIG_NET_PLAYLIST = 21,
+
+        // Token: 0x0400047A RID: 1146
+        BASS_CONFIG_MUSIC_VIRTUAL,
+
+        // Token: 0x0400047B RID: 1147
+        BASS_CONFIG_VERIFY,
+
+        // Token: 0x0400047C RID: 1148
+        BASS_CONFIG_UPDATETHREADS,
+
+        // Token: 0x0400047D RID: 1149
+        BASS_CONFIG_DEV_BUFFER = 27,
+
+        // Token: 0x0400047E RID: 1150
+        BASS_CONFIG_VISTA_TRUEPOS = 30,
+
+        // Token: 0x0400047F RID: 1151
+        BASS_CONFIG_MP3_ERRORS = 35,
+
+        // Token: 0x04000480 RID: 1152
+        BASS_CONFIG_DEV_DEFAULT,
+
+        // Token: 0x04000481 RID: 1153
+        BASS_CONFIG_NET_READTIMEOUT,
+
+        // Token: 0x04000482 RID: 1154
+        BASS_CONFIG_VISTA_SPEAKERS,
+
+        // Token: 0x04000483 RID: 1155
+        BASS_CONFIG_HANDLES = 41,
+
+        // Token: 0x04000484 RID: 1156
+        BASS_CONFIG_UNICODE,
+
+        // Token: 0x04000485 RID: 1157
+        BASS_CONFIG_SRC,
+
+        // Token: 0x04000486 RID: 1158
+        BASS_CONFIG_SRC_SAMPLE,
+
+        // Token: 0x04000487 RID: 1159
+        BASS_CONFIG_ASYNCFILE_BUFFER,
+
+        // Token: 0x04000488 RID: 1160
+        BASS_CONFIG_OGG_PRESCAN = 47,
+
+        // Token: 0x04000489 RID: 1161
+        BASS_CONFIG_MF_VIDEO,
+
+        // Token: 0x0400048A RID: 1162
+        BASS_CONFIG_VERIFY_NET = 52,
+
+        // Token: 0x0400048B RID: 1163
+        BASS_CONFIG_AC3_DYNRNG = 65537,
+
+        // Token: 0x0400048C RID: 1164
+        BASS_CONFIG_WMA_PREBUF = 65793,
+
+        // Token: 0x0400048D RID: 1165
+        BASS_CONFIG_WMA_BASSFILE = 65795,
+
+        // Token: 0x0400048E RID: 1166
+        BASS_CONFIG_WMA_NETSEEK,
+
+        // Token: 0x0400048F RID: 1167
+        BASS_CONFIG_WMA_VIDEO,
+
+        // Token: 0x04000490 RID: 1168
+        BASS_CONFIG_WMA_ASYNC = 65807,
+
+        // Token: 0x04000491 RID: 1169
+        BASS_CONFIG_CD_FREEOLD = 66048,
+
+        // Token: 0x04000492 RID: 1170
+        BASS_CONFIG_CD_RETRY,
+
+        // Token: 0x04000493 RID: 1171
+        BASS_CONFIG_CD_AUTOSPEED,
+
+        // Token: 0x04000494 RID: 1172
+        BASS_CONFIG_CD_SKIPERROR,
+
+        // Token: 0x04000495 RID: 1173
+        BASS_CONFIG_CD_CDDB_SERVER,
+
+        // Token: 0x04000496 RID: 1174
+        BASS_CONFIG_ENCODE_PRIORITY = 66304,
+
+        // Token: 0x04000497 RID: 1175
+        BASS_CONFIG_ENCODE_QUEUE,
+
+        // Token: 0x04000498 RID: 1176
+        BASS_CONFIG_ENCODE_ACM_LOAD,
+
+        // Token: 0x04000499 RID: 1177
+        BASS_CONFIG_ENCODE_CAST_TIMEOUT = 66320,
+
+        // Token: 0x0400049A RID: 1178
+        BASS_CONFIG_ENCODE_CAST_PROXY,
+
+        // Token: 0x0400049B RID: 1179
+        BASS_CONFIG_MIDI_COMPACT = 66560,
+
+        // Token: 0x0400049C RID: 1180
+        BASS_CONFIG_MIDI_VOICES,
+
+        // Token: 0x0400049D RID: 1181
+        BASS_CONFIG_MIDI_AUTOFONT,
+
+        // Token: 0x0400049E RID: 1182
+        BASS_CONFIG_MIDI_DEFFONT,
+
+        // Token: 0x0400049F RID: 1183
+        BASS_CONFIG_MIDI_IN_PORTS,
+
+        // Token: 0x040004A0 RID: 1184
+        BASS_CONFIG_MIXER_FILTER = 67072,
+
+        // Token: 0x040004A1 RID: 1185
+        BASS_CONFIG_MIXER_BUFFER,
+
+        // Token: 0x040004A2 RID: 1186
+        BASS_CONFIG_MIXER_POSEX,
+
+        // Token: 0x040004A3 RID: 1187
+        BASS_CONFIG_SPLIT_BUFFER = 67088,
+
+        // Token: 0x040004A4 RID: 1188
+        BASS_CONFIG_MP4_VIDEO = 67328,
+
+        // Token: 0x040004A5 RID: 1189
+        BASS_CONFIG_AAC_PRESCAN = 67330,
+
+        // Token: 0x040004A6 RID: 1190
+        BASS_CONFIG_AAC_MP4 = 67329,
+
+        // Token: 0x040004A7 RID: 1191
+        BASS_CONFIG_WINAMP_INPUT_TIMEOUT = 67584,
+
+        // Token: 0x040004A8 RID: 1192
+        BASS_CONFIG_DSD_FREQ = 67584,
+
+        // Token: 0x040004A9 RID: 1193
+        BASS_CONFIG_DSD_GAIN
+    }
+}

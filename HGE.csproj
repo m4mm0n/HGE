@@ -55,7 +55,8 @@
     <Reference Include="NAudio">
       <HintPath>..\NAudio.dll</HintPath>
     </Reference>
-    <Reference Include="OpenTK, Version=3.0.1.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+    <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\OpenTK.3.0.1\lib\net20\OpenTK.dll</HintPath>
     </Reference>
     <Reference Include="System" />
@@ -84,6 +85,7 @@
     <Compile Include="Graphics\Graphics2DGL.cs" />
     <Compile Include="Graphics\GraphicsExt.cs" />
     <Compile Include="Graphics\NoiseGenerator.cs" />
+    <Compile Include="Graphics\Particle.cs" />
     <Compile Include="Graphics\Pixel.cs" />
     <Compile Include="Graphics\Primitives\Circle.cs" />
     <Compile Include="Graphics\Primitives\DrawablePrimitives.cs" />

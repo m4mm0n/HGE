@@ -36,6 +36,24 @@ namespace HGE.IO
             return ts;
         }
 
+        public static Color ToColor(this string argb)
+        {
+            uint tmp = 0;
+
+            if (uint.TryParse(argb, System.Globalization.NumberStyles.HexNumber, null, out tmp))
+                return ToColor(tmp);
+
+            throw new IOException("argb MUST be hexadecimals!");
+        }
+
+        public static Color ToColor(this uint argb)
+        {
+            return Color.FromArgb((byte)((argb & -16777216) >> 0x18),
+                                  (byte)((argb & 0xff0000) >> 0x10),
+                                  (byte)((argb & 0xff00) >> 8),
+                                  (byte)(argb & 0xff));
+        }
+
         public static Bitmap ResizeImage(Bitmap image, int Width, int Height, bool preserveAspectRatio)
         {
             return ResizeImage(image, new Size(Width, Height), preserveAspectRatio);
@@ -229,6 +247,21 @@ namespace HGE.IO
             }
 
             return 0;
+        }
+
+        public static Bitmap FromBase64(string toGetImageFrom)
+        {
+            try
+            {
+                using (var mem = new MemoryStream(Convert.FromBase64String(toGetImageFrom)))
+                {
+                    var bmp = new Bitmap(mem);
+                    return bmp;
+                }
+            }catch(Exception ex)
+            {
+                throw new Exception("FromBase64 Exception!", ex);
+            }
         }
 
         /// <summary>

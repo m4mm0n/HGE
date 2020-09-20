@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using HGE.IO.AudioEngine.sidPlayLib.components.mos656x;
 

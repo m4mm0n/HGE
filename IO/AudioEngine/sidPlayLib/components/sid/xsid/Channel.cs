@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using HGE.IO.AudioEngine.sidPlayLib.common;
 using HGE.IO.AudioEngine.sidPlayLib.common.events;
 

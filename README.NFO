@@ -26,6 +26,11 @@ GL Core - SzarkEngine by https://github.com/jakubshark, Pixel-Engine by https://
 
 [VERSION HISTORY]
  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+ v0.2 [build 5 DC xx/05/19]
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^
+ + Added ToColor helper function to help convert from hexa to color...
+ + Added ParticleA & ParticleB for particle functions...
+
  v0.2 [build 4 DC 26/04/19]
  ^^^^^^^^^^^^^^^^^^^^^^^^^^
  + Added custom exception handler for AudioEngine...

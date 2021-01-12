@@ -247,6 +247,39 @@ namespace HGE.Graphics
             }
         }
 
+        public void DrawLine(int x1, int y1, int x2, int y2, Pixel color, int thickness = 1)
+        {
+            float x, y, step;
+            float dx = x2 - x1;
+            float dy = y2 - y1;
+
+            var absDX = Math.Abs(dx);
+            var absDY = Math.Abs(dy);
+
+            step = absDX >= absDY ? absDX : absDY;
+
+            dx /= step;
+            dy /= step;
+
+            x = x1;
+            y = y1;
+
+            for (var i = 1; i <= step; i++)
+            {
+                SetPixel((int)x, (int)y, color);
+
+                if (thickness > 1)
+                    for (var j = 1; j < thickness; j++)
+                    {
+                        SetPixel((int)x + j, (int)y, color);
+                        SetPixel((int)x, (int)y + j, color);
+                    }
+
+                x += dx;
+                y += dy;
+            }
+        }
+
         /// <summary>
         ///     Clears the sprite to a specific color
         /// </summary>

@@ -422,6 +422,7 @@ namespace HGE
 
         public void PerformContextUpdate()
         {
+            GC.Collect();
             if (context != null) context.Update(Implementation.WindowInfo);
         }
 
@@ -433,6 +434,8 @@ namespace HGE
 
         protected override void OnHandleCreated(EventArgs e)
         {
+            GC.Collect();
+
             if (context != null) context.Dispose();
             if (implementation != null) implementation.WindowInfo.Dispose();
             if (design_mode)
@@ -514,6 +517,7 @@ namespace HGE
 
         private void ValidateState()
         {
+            GC.Collect();
             if (IsDisposed) throw new ObjectDisposedException(GetType().Name);
             if (!IsHandleCreated) CreateControl();
             if (implementation == null || context == null || context.IsDisposed) RecreateHandle();
